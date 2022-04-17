@@ -1,6 +1,8 @@
 import os
 import re
 import exrex
+import time
+import datetime
 
 
 car_re = re.compile(r'''
@@ -39,11 +41,13 @@ carwash_records = []
 
 def ReadFile(fileName):
     f = open(fileName, 'r')
+    No = 1
     while True:
         data = f.readline()
         if data:
             carNum, cost, etc = car_re.search(data).groups()
-            carwash_records.append((carNum.replace(" ",''), cost, etc))
+            carwash_records.append((No, carNum.replace(" ",''), cost, etc))
+            No += 1
         else:
             break
 
@@ -65,13 +69,15 @@ def InsertCarData():
 
 
 
-def SearchCarData():
-    text = input()
-    find_list = []
+def PrintAll():
+    No = 1
     for data in carwash_records:
-        if data[0] == text.replace(" ", ''):
-            find_list.append(data)
-    print(data)
+        print(format(f"{data[0]:4}\t{data[1]:>8}\t{data[2]:>5}\t{data[3]}"))
+        No += 1
+
+
+def ShowOne(data):
+    print(format(f"{No:4}\t{data[0]:>8}\t{data[1]:>5}\t{data[2]}"))
 
 
 def DeleteCarDataByCarNum():
@@ -87,15 +93,36 @@ def DeleteAllCarByEtc():
 
 
 def FindCarDataByCarNum():
-    pass
+    text = input()
+    find_list = []
+    for data in carwash_records:
+        if data[1] == text.replace(" ", ''):
+            find_list.append(data)
+            print(find_list)
+            return True
+    return False
 
 
 def FindAllCarByCost():
-    pass
+    text = input()
+    find_list = []
+    for data in carwash_records:
+        if data[2] == text.replace(" ", ''):
+            find_list.append(data)
+            print(find_list)
+            return True
+    return False
 
 
 def FindAllCarByEtc():
-    pass
+    text = input()
+    find_list = []
+    for data in carwash_records:
+        if data[3] == text.replace(" ", ''):
+            find_list.append(data)
+            print(find_list)
+            return True
+    return False
 
 
 def ReviseCost():
@@ -117,5 +144,5 @@ if __name__ == '__main__':
     #     carwash_records.append((carNum.replace(" ",''), cost, etc))
     # WriteFile()
     ReadFile('carlist.txt')
-    for data in carwash_records:
-        print(data)
+    PrintAll()
+    FindAllCarByEtc()
