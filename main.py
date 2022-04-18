@@ -38,7 +38,6 @@ final_pattern = re.sub(r'[ ]{2,}|\t|\n', '', pattern)
 carwash_records = []
 
 
-
 def ReadFile(fileName):
     f = open(fileName, 'r')
     No = 1
@@ -81,7 +80,19 @@ def ShowOne(data):
 
 
 def DeleteCarDataByCarNum():
-    pass
+    global carwash_records
+    text = input()
+    find_list = []
+    for data in carwash_records:
+        if data[1] == text.replace(" ", ''):
+            find_list.append(data)
+            print(find_list)
+    if not find_list:
+        return False
+    for d in find_list:
+        carwash_records.remove(d)
+    return True
+
 
 
 def DeleteAllCarByCost():
@@ -145,4 +156,5 @@ if __name__ == '__main__':
     # WriteFile()
     ReadFile('carlist.txt')
     PrintAll()
-    FindAllCarByEtc()
+    DeleteCarDataByCarNum()
+    PrintAll()
