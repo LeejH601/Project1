@@ -10,8 +10,6 @@ import datetime
 # test_str = [exrex.getone(final_pattern, 5) for _ in range(1000)]
 
 class carlist:
-    carwash_records = []
-
     car_re = re.compile(r'''
     ^
     (\d{2,3}    
@@ -41,8 +39,7 @@ class carlist:
     final_pattern = re.sub(r'[ ]{2,}|\t|\n', '', pattern)
 
     def __init__(self):
-        pass
-
+        self.carwash_records = []
 
     def ReadFile(self, fileName):
         f = open(fileName, 'r')
@@ -55,6 +52,7 @@ class carlist:
                 No += 1
             else:
                 break
+        f.close()
 
 
     def WriteFile(self, fileName):
@@ -128,18 +126,17 @@ class carlist:
         return True
 
 
-    def FindCarDataByCarNum(self):
-        text = input()
+    def FindCarDataByCarNum(self, text):
         find_list = []
         for data in self.carwash_records:
             if data[1] == text.replace(" ", ''):
                 find_list.append(data)
+                print(find_list)
                 return find_list
         return None
 
 
-    def FindAllCarByCost(self):
-        text = input()
+    def FindAllCarByCost(self, text):
         find_list = []
         for data in self.carwash_records:
             if data[2] == text.replace(" ", ''):
@@ -148,8 +145,7 @@ class carlist:
         return None
 
 
-    def FindAllCarByEtc(self):
-        text = input()
+    def FindAllCarByEtc(self, text):
         find_list = []
         for data in self.carwash_records:
             if data[3] == text.replace(" ", ''):
