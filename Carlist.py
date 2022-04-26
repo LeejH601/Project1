@@ -17,7 +17,7 @@ class carlist:
     [ ]*
     \d{4})
     [ ]*
-    (\d{4,5})
+    (\d{4})
     [ ]*
     (.*)
     ''', re.VERBOSE)
@@ -30,7 +30,8 @@ class carlist:
     [ ]*
     \d{4})
     [ ]*
-    (\d{4,5})
+    (\d
+    000)
     [ ]*
     (.*)
     '''
@@ -59,7 +60,7 @@ class carlist:
     def WriteFile(self, fileName):
         f = open(fileName, 'w')
         for data in self.carwash_records:
-            f.write(str(data[0] + data[1] + data[2])+'\n')
+            f.write(str(data[1]) + str(data[2]) + str(data[3])+'\n')
         f.close()
 
 
@@ -85,8 +86,7 @@ class carlist:
         print(format(f"{data[0]:4}\t{data[1]:>8}\t{data[2]:>5}\t{data[3]}"))
 
 
-    def DeleteCarDataByCarNum(self):
-        text = input()
+    def DeleteCarDataByCarNum(self,text):
         find_list = []
         for data in self.carwash_records:
             if data[1] == text.replace(" ", ''):
@@ -100,8 +100,7 @@ class carlist:
 
 
 
-    def DeleteAllCarByCost(self):
-        text = input()
+    def DeleteAllCarByCost(self, text):
         find_list = []
         for data in self.carwash_records:
             if data[2] == text.replace(" ", ''):
@@ -114,8 +113,7 @@ class carlist:
         return True
 
 
-    def DeleteAllCarByEtc(self):
-        text = input()
+    def DeleteAllCarByEtc(self, text):
         find_list = []
         for data in self.carwash_records:
             if data[3] == text.replace(" ", ''):
@@ -173,6 +171,7 @@ class carlist:
         for data in self.carwash_records:
             data[0] = no
             no += 1
+        self.nCars = no-1
 
 
 if __name__ == '__main__':

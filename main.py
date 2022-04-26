@@ -18,6 +18,46 @@ def addData(container, entry_box, c_list):
     entry_box.delete(0, END)
 
 
+def deleteData(container, entry_box, c_list):
+    child_window = Tk()
+    child_window.geometry('+0+0')
+    child_window.resizable(False, False)
+
+    def quit_child(event=None):
+        child_window.quit()
+        child_window.destroy()
+
+    child_window.bind('<Escape>', quit_child)
+
+    target_entry = Entry(child_window)
+    target_entry.pack()
+
+    def deleteItem(case):
+        text = target_entry.get()
+        if case == 0:
+            result = container.DeleteCarDataByCarNum(text)
+        elif case == 1:
+            result = container.DeleteAllCarByCost(text)
+        elif case == 2:
+            result = container.DeleteAllCarByEtc(text)
+        if result:
+            cars_list.delete(0, END)
+            for no, carNum, cost, etc in container.carwash_records:
+                cars_list.insert(END, f'{no} {carNum} {cost} {etc}')
+            quit_child()
+            return result
+        return None
+
+    Button(child_window, text='번호로 삭제', command=partial(deleteItem, 0)).pack(side=LEFT, expand=True, fill=BOTH, padx=5,
+                                                                           pady=2)
+    Button(child_window, text='비용으로 일괄 삭제', command=partial(deleteItem, 1)).pack(side=LEFT, expand=True, fill=BOTH, padx=5,
+                                                                          pady=2)
+    Button(child_window, text='기타 일괄 삭제', command=partial(deleteItem, 2)).pack(side=LEFT, expand=True, fill=BOTH, padx=5,
+                                                                       pady=2)
+
+    child_window.mainloop()
+
+
 def FindData(container):
     child_window = Tk()
     child_window.geometry('+0+0')
@@ -100,6 +140,6 @@ if __name__ == '__main__':
 
     Button(third_label_frame, text='추가', command=partial(addData, wash_list, data_entry, cars_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
     Button(third_label_frame, text='검색', command=partial(FindData, wash_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
-    Button(third_label_frame, text='삭제', ).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
+    Button(third_label_frame, text='삭제', command=partial(deleteData, wash_list, data_entry, cars_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
 
     main_window.mainloop()
