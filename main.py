@@ -9,6 +9,15 @@ def stop(event=None):
     main_window.quit()
 
 
+def addData(container, entry_box, c_list):
+    text = entry_box.get()
+    if container.InsertCarData(text):
+        c_list.delete(0,END)
+        for no, carNum, cost, etc in container.carwash_records:
+            c_list.insert(END, f'{no} {carNum} {cost} {etc}')
+    entry_box.delete(0, END)
+
+
 def FindData(container):
     child_window = Tk()
     child_window.geometry('+0+0')
@@ -89,7 +98,7 @@ if __name__ == '__main__':
     third_label_frame = LabelFrame()
     third_label_frame.pack(fill=BOTH, padx=5, pady=5)
 
-    Button(third_label_frame, text='추가', ).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
+    Button(third_label_frame, text='추가', command=partial(addData, wash_list, data_entry, cars_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
     Button(third_label_frame, text='검색', command=partial(FindData, wash_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
     Button(third_label_frame, text='삭제', ).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
 

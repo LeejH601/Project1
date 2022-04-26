@@ -7,7 +7,6 @@ import datetime
 
 
 
-# test_str = [exrex.getone(final_pattern, 5) for _ in range(1000)]
 
 class carlist:
     car_re = re.compile(r'''
@@ -40,6 +39,7 @@ class carlist:
 
     def __init__(self):
         self.carwash_records = []
+        self.nCars = 0
 
     def ReadFile(self, fileName):
         f = open(fileName, 'r')
@@ -52,6 +52,7 @@ class carlist:
                 No += 1
             else:
                 break
+        self.nCars= len(self.carwash_records)
         f.close()
 
 
@@ -62,14 +63,15 @@ class carlist:
         f.close()
 
 
-    def InsertCarData(self):
-        text = input()
+    def InsertCarData(self, text):
         mo = self.car_re.search(text)
         if mo:
-            self.carwash_records.append(list(mo.groups()))
+            self.nCars += 1
+            self.carwash_records.append([self.nCars, mo.group(1), mo.group(2), mo.group(3)])
+            return True
         else:
             print('형식이 올바르지 않음.')
-
+        return False
 
 
     def PrintAll(self):
@@ -171,3 +173,12 @@ class carlist:
         for data in self.carwash_records:
             data[0] = no
             no += 1
+
+
+if __name__ == '__main__':
+    test_str = [exrex.getone(carlist.final_pattern, 5) for _ in range(100)]
+
+    test_c = carlist()
+    for text in test_str:
+        test_c.InsertCarData(text)
+    test_c.WriteFile('carlist.txt')
