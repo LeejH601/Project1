@@ -174,10 +174,36 @@ class carlist:
         self.nCars = no-1
 
 
+class managemnetList(carlist):
+    manage_re = re.compile(r'''
+        ^
+        (\d{2,3}    
+        [ ]*
+        [가-힣]
+        [ ]*
+        \d{4})
+        [ ]*
+        (.*)
+        ''', re.VERBOSE)
+
+    def __init__(self):
+        super(managemnetList, self).__init__()
+
+    def InsertCarData(self, text):
+        mo = self.manage_re.search(text)
+        if mo:
+            self.nCars += 1
+            self.carwash_records.append([self.nCars, mo.group(1), '0000', mo.group(2)])
+            return True
+        else:
+            print('형식이 올바르지 않음.')
+        return False
+
+
 if __name__ == '__main__':
-    test_str = [exrex.getone(carlist.final_pattern, 5) for _ in range(100)]
+    test_str = [exrex.getone(carlist.final_pattern, 5) for _ in range(10)]
 
     test_c = carlist()
     for text in test_str:
         test_c.InsertCarData(text)
-    test_c.WriteFile('carlist.txt')
+    test_c.WriteFile('accountlist.txt')
