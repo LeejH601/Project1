@@ -180,6 +180,8 @@ def open_file(container, c_list, r_filename):
                                            filetypes=(("text files (.txt)", "*.txt"), ("all files", "*.*")))
     container.ReadFile(file_name)
     container.filename = file_name
+    fn = file_name.split('/')
+    list_text.set('carList - ' + fn[len(fn)-1][:-4])
     reset_list(container, c_list)
 
 
@@ -248,7 +250,12 @@ if __name__ == '__main__':
     second_label_frame = LabelFrame()
     second_label_frame.pack(fill=BOTH, padx=5, pady=5)
 
-    list_label = Label(second_label_frame, text='carList')
+    list_text = StringVar()
+
+    fn = openfilename.split('/')
+    list_text.set('carList - ' + fn[len(fn)-1][:-4])
+
+    list_label = Label(second_label_frame, textvariable=list_text)
     list_label.pack(padx=5)
 
     cars_list = Listbox(second_label_frame, height=20)
