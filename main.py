@@ -221,9 +221,13 @@ if __name__ == '__main__':
     wash_list.ReadFile(openfilename)
 
     black_list = Carlist.managemnetList()
+    if not 'blacklist.txt' in os.listdir():
+        open('blacklist.txt', 'w').close()
     black_list.ReadFile('blacklist.txt')
 
     account_list = Carlist.managemnetList()
+    if not 'accountlist.txt' in os.listdir():
+        open('accountlist.txt', 'w').close()
     account_list.ReadFile('accountlist.txt')
 
     text_car_List = ''
