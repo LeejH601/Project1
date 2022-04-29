@@ -153,16 +153,17 @@ class carlist:
             for data in self.carwash_records:
                 if data[2] == text.replace(" ", ''):
                     find_list.append(data)
-                    return find_list
+            return find_list
         return None
 
 
     def FindAllCarByEtc(self, text):
         find_list = []
-        for data in self.carwash_records:
-            if data[3] == text.replace(" ", ''):
-                find_list.append(data)
-                return find_list
+        if self.carwash_records:
+            for data in self.carwash_records:
+                if data[3] == text.replace(" ", ''):
+                    find_list.append(data)
+            return find_list
         return None
 
 
