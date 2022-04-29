@@ -41,9 +41,11 @@ class carlist:
     def __init__(self):
         self.carwash_records = []
         self.nCars = 0
+        self.filename = ''
 
     def ReadFile(self, fileName):
         f = open(fileName, 'r')
+        self.carwash_records.clear()
         No = 1
         while True:
             data = f.readline()
@@ -54,11 +56,15 @@ class carlist:
             else:
                 break
         self.nCars= len(self.carwash_records)
+        self.filename = fileName
         f.close()
 
 
-    def WriteFile(self, fileName):
-        f = open(fileName, 'w')
+    def WriteFile(self, fileName=None):
+        fname = fileName
+        if not fname:
+            fname = self.filename
+        f = open(fname, 'w')
         for data in self.carwash_records:
             f.write(str(data[1]) + str(data[2]) + str(data[3])+'\n')
         f.close()
@@ -77,9 +83,10 @@ class carlist:
 
     def PrintAll(self):
         No = 1
-        for data in self.carwash_records:
-            print(format(f"{data[0]:4}\t{data[1]:>8}\t{data[2]:>5}\t{data[3]}"))
-            No += 1
+        if self.carwash_records:
+            for data in self.carwash_records:
+                print(format(f"{data[0]:4}\t{data[1]:>8}\t{data[2]:>5}\t{data[3]}"))
+                No += 1
 
 
     def ShowOne(self, data):
@@ -88,9 +95,10 @@ class carlist:
 
     def DeleteCarDataByCarNum(self,text):
         find_list = []
-        for data in self.carwash_records:
-            if data[1] == text.replace(" ", ''):
-                find_list.append(data)
+        if self.carwash_records:
+            for data in self.carwash_records:
+                if data[1] == text.replace(" ", ''):
+                    find_list.append(data)
         if not find_list:
             return False
         for d in find_list:
@@ -102,9 +110,10 @@ class carlist:
 
     def DeleteAllCarByCost(self, text):
         find_list = []
-        for data in self.carwash_records:
-            if data[2] == text.replace(" ", ''):
-                find_list.append(data)
+        if self.carwash_records:
+            for data in self.carwash_records:
+                if data[2] == text.replace(" ", ''):
+                    find_list.append(data)
         if not find_list:
             return False
         for d in find_list:
@@ -115,9 +124,10 @@ class carlist:
 
     def DeleteAllCarByEtc(self, text):
         find_list = []
-        for data in self.carwash_records:
-            if data[3] == text.replace(" ", ''):
-                find_list.append(data)
+        if self.carwash_records:
+            for data in self.carwash_records:
+                if data[3] == text.replace(" ", ''):
+                    find_list.append(data)
         if not find_list:
             return False
         for d in find_list:
@@ -128,20 +138,22 @@ class carlist:
 
     def FindCarDataByCarNum(self, text):
         find_list = []
-        for data in self.carwash_records:
-            if data[1] == text.replace(" ", ''):
-                find_list.append(data)
-                print(find_list)
-                return find_list
+        if self.carwash_records:
+            for data in self.carwash_records:
+                if data[1] == text.replace(" ", ''):
+                    find_list.append(data)
+                    print(find_list)
+                    return find_list
         return None
 
 
     def FindAllCarByCost(self, text):
         find_list = []
-        for data in self.carwash_records:
-            if data[2] == text.replace(" ", ''):
-                find_list.append(data)
-                return find_list
+        if self.carwash_records:
+            for data in self.carwash_records:
+                if data[2] == text.replace(" ", ''):
+                    find_list.append(data)
+                    return find_list
         return None
 
 
@@ -201,9 +213,18 @@ class managemnetList(carlist):
 
 
 if __name__ == '__main__':
-    test_str = [exrex.getone(carlist.final_pattern, 5) for _ in range(10)]
+    for i in range(1):
+        test_str = [exrex.getone(carlist.final_pattern, 10) for _ in range(60)]
 
-    test_c = carlist()
-    for text in test_str:
-        test_c.InsertCarData(text)
-    test_c.WriteFile('accountlist.txt')
+        test_c = carlist()
+        for text in test_str:
+            test_c.InsertCarData(text)
+        test_c.WriteFile('washdatas/wash_' + str(20220429-i) + '.txt')
+
+        car = carlist()
+        car.ReadFile('washdatas/wash_' + str(20220429-i) + '.txt')
+        for no, carNum, cost, etc in car.carwash_records:
+            if cost == '0000':
+                car.carwash_records[no-1][2] = '7000'
+
+        car.WriteFile('washdatas/wash_' + str(20220429-i) + '.txt')

@@ -1,8 +1,12 @@
+import datetime
+import tkinter.messagebox
+import os
 import Carlist
 from tkinter import *
 from tkinter.ttk import *
 from tkinter.scrolledtext import ScrolledText
 from functools import partial
+from tkinter import filedialog
 
 
 def stop(event=None):
@@ -18,14 +22,15 @@ def reset_list(container, c_list):
             c_list.insert(END, f'{no} {carNum} {etc}')
 
 
-def addData(container, entry_box, c_list, b_list):
+def addData(container, entry_box, c_list, b_list, a_cont):
     text = entry_box.get()
     mo = container.car_re.search(text)
     if b_list.FindCarDataByCarNum( mo.group(1)):
-        entry_box.delete(0, END)
-        entry_box.insert(0, '추가할 수 없음')
-        return
+        if not tkinter.messagebox.askokcancel("attention","블랙 리스트에 등록된 차량입니다. 등록하시겠습니까?"):
+            return
     if container.InsertCarData(text):
+        if a_cont.FindCarDataByCarNum(container.carwash_records[container.nCars-1][1] ):
+            container.carwash_records[container.nCars - 1][2] = str(int(0.7 * int(container.carwash_records[container.nCars - 1][2])))
         c_list.delete(0,END)
         for no, carNum, cost, etc in container.carwash_records:
             c_list.insert(END, f'{no} {carNum} {cost} {etc}')
@@ -76,7 +81,8 @@ def deleteData(container, entry_box, c_list):
 
     Button(child_window, text='번호로 삭제', command=partial(deleteItem, 0)).pack(side=LEFT, expand=True, fill=BOTH, padx=5,
                                                                            pady=2)
-    Button(child_window, text='비용으로 일괄 삭제', command=partial(deleteItem, 1)).pack(side=LEFT, expand=True, fill=BOTH, padx=5,
+    if not type(container) == Carlist.managemnetList:
+        Button(child_window, text='비용으로 일괄 삭제', command=partial(deleteItem, 1)).pack(side=LEFT, expand=True, fill=BOTH, padx=5,
                                                                           pady=2)
     Button(child_window, text='기타 일괄 삭제', command=partial(deleteItem, 2)).pack(side=LEFT, expand=True, fill=BOTH, padx=5,
                                                                        pady=2)
@@ -118,7 +124,8 @@ def FindData(container, c_list):
         return None
 
     Button(child_window, text='번호로 검색', command=partial(finditme, 0)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
-    Button(child_window, text='비용으로 검색', command=partial(finditme, 1)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
+    if not type(container) == Carlist.managemnetList:
+        Button(child_window, text='비용으로 검색', command=partial(finditme, 1)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
     Button(child_window, text='기타', command=partial(finditme, 2)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
 
     child_window.mainloop()
@@ -131,10 +138,12 @@ def managementList(managementList, window_name):
     child_window.resizable(False, False)
 
     def quit_child(event=None):
+        managementList.WriteFile()
         child_window.quit()
         child_window.destroy()
 
     child_window.bind('<Escape>', quit_child)
+    child_window.protocol("WM_DELETE_WINDOW", quit_child)
 
     b_entry_frame = LabelFrame(child_window)
     b_entry_frame.pack(padx=5)
@@ -166,13 +175,48 @@ def managementList(managementList, window_name):
     child_window.mainloop()
 
 
+def open_file(container, c_list, r_filename):
+    file_name = filedialog.askopenfilename(title='Select text files',
+                                           filetypes=(("text files (.txt)", "*.txt"), ("all files", "*.*")))
+    container.ReadFile(file_name)
+    container.filename = file_name
+    reset_list(container, c_list)
+
+
+def save_file(container, filename):
+    container.WriteFile(filename)
+
+
 if __name__ == '__main__':
-    # for text in test_str:
-    #     carNum, cost, etc = car_re.search(text).groups()
-    #     carwash_records.append((carNum.replace(" ",''), cost, etc))
-    # WriteFile()
+    if not 'config.txt' in os.listdir():
+        open('config.txt', 'w').close()
+    conf_f = open('config.txt', 'r')
+
+    openfilename = ''
+    file_info = []
+
+    if not 'washdatas' in os.listdir():
+        os.mkdir('washdatas')
+    for root, subfolder, filenames in os.walk('/washdatas'):
+        for fn in filenames:
+            file_info.append((root, subfolder, fn))
+
+    while not openfilename:
+        data = conf_f.readline()
+        if not data:
+            currentTime = datetime.datetime.now()
+            openfilename = 'washdatas/wash_' + currentTime.strftime('%Y%m%d') +'.txt'
+            f = open(openfilename, 'w')
+            f.close()
+            conf_f.close()
+            conf_f = open('config.txt', 'w')
+            conf_f.write(openfilename)
+            break
+        openfilename = data
+    conf_f.close()
+
     wash_list = Carlist.carlist()
-    wash_list.ReadFile('carlist.txt')
+    wash_list.ReadFile(openfilename)
 
     black_list = Carlist.managemnetList()
     black_list.ReadFile('blacklist.txt')
@@ -215,7 +259,7 @@ if __name__ == '__main__':
     third_label_frame = LabelFrame()
     third_label_frame.pack(fill=BOTH, padx=5, pady=5)
 
-    Button(third_label_frame, text='추가', command=partial(addData, wash_list, data_entry, cars_list, black_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
+    Button(third_label_frame, text='추가', command=partial(addData, wash_list, data_entry, cars_list, black_list, account_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
     Button(third_label_frame, text='검색', command=partial(FindData, wash_list, cars_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
     Button(third_label_frame, text='삭제', command=partial(deleteData, wash_list, data_entry, cars_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
     Button(third_label_frame, text='초기화', command=partial(reset_list, wash_list, cars_list)).pack(side=LEFT, expand=True, fill=BOTH, padx=5, pady=2)
@@ -225,5 +269,16 @@ if __name__ == '__main__':
 
     Button(fourth_label_frame, text='블랙리스트', command=partial(managementList, black_list, 'blackList')).pack(side=LEFT,expand=True,fill=BOTH,padx=5,pady=2)
     Button(fourth_label_frame, text='거래처', command=partial(managementList, account_list, 'accountList')).pack(side=LEFT,expand=True,fill=BOTH,padx=5,pady=2)
+
+    menu = Menu()
+    menu_file = Menu(menu, tearoff=False)
+    menu_file.add_command(label='Open', command=partial(open_file, wash_list, cars_list,  openfilename), accelerator='Ctrl+o')
+    menu_file.add_command(label='Save File', command=partial(save_file, wash_list, None), accelerator='Ctrl+s')
+    menu_file.add_separator()
+    menu_file.add_command(label='Quit', accelerator='Ctrl+q')
+
+    menu.add_cascade(label='File', menu=menu_file)
+
+    main_window.config(menu=menu)
 
     main_window.mainloop()
